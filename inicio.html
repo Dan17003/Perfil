@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danna Mendoza | System OS v5.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@300;500&display=swap');
+        
+        body { background: #000; color: #fff; font-family: 'JetBrains Mono', monospace; overflow: hidden; opacity: 0; animation: system-boot 1.5s ease-out forwards; }
+        .font-title { font-family: 'Syncopate', sans-serif; }
+        
+        #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; }
+
+        .glass {
+            background: rgba(20, 10, 30, 0.6);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(157, 0, 255, 0.3);
+            box-shadow: 0 0 40px rgba(157, 0, 255, 0.15);
+        }
+
+        .tab-active {
+            background: linear-gradient(90deg, #9d00ff, #ff00ff);
+            color: white;
+            box-shadow: 0 0 15px #ff00ff;
+        }
+
+        .neo-button {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .neo-button:hover {
+            border-color: #ff00ff;
+            text-shadow: 0 0 8px #ff00ff;
+            transform: translateX(10px);
+        }
+
+        /* Burbuja de chat del Robot */
+        .chat-bubble {
+            position: fixed;
+            bottom: 120px;
+            right: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #ff00ff;
+            color: #ff00ff;
+            padding: 10px 15px;
+            border-radius: 15px 15px 0 15px;
+            font-size: 10px;
+            max-width: 200px;
+            z-index: 60;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .chat-bubble.show { opacity: 1; transform: translateY(0); }
+
+        /* Animación de carga del sistema */
+        @keyframes system-boot {
+            0% { opacity: 0; transform: scale(0.9) translateY(20px); filter: blur(5px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+        }
+
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body x-data="{ 
+        tab: 'perfil', 
+        botMessage: 'Iniciando sistema... Analizando usuario...', 
+        showBotMessage: true, 
+        setTab(newTab, message) { 
+            this.tab = newTab; 
+            this.botMessage = message; 
+            this.showBotMessage = true; 
+            setTimeout(() => this.showBotMessage = false, 5000); 
+        } 
+    }" x-init="setTimeout(() => setTab('perfil', '¡Hola! Soy Nova, el asistente de Danna. ¿En qué puedo ayudarte hoy?'), 2000)">
+
+    <canvas id="bg-canvas"></canvas>
+
+    <header class="fixed top-0 w-full p-8 flex justify-between items-center z-50">
+        <div>
+            <h1 class="font-title text-xl font-bold tracking-[0.4em] text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-pink-500">
+                DANNA MENDOZA CONTRERAS
+            </h1>
+            
+        </div>
+        <div class="text-right pointer-auto flex items-center gap-4">
+            <div class="text-[10px] text-white/40 italic">System Status</div>
+            <span class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_#10b981]"></span>
+        </div>
+    </header>
+
+    <main class="h-screen w-screen flex items-center justify-center p-4">
+        <div class="glass w-full max-w-5xl h-[70vh] rounded-[2rem] flex overflow-hidden relative">
+            
+            <nav class="w-20 md:w-64 border-r border-white/10 flex flex-col justify-center gap-4 p-4 z-20">
+                <button @click="setTab('perfil', 'Accediendo a la matriz de datos de Danna...')" :class="tab === 'perfil' ? 'tab-active' : ''" class="neo-button p-4 rounded-xl text-xs font-bold uppercase tracking-widest">Perfil</button>
+                <button @click="setTab('exp', 'Analizando registros laborales pasados y presentes...')" :class="tab === 'exp' ? 'tab-active' : ''" class="neo-button p-4 rounded-xl text-xs font-bold uppercase tracking-widest">Experiencia</button>
+                <button @click="setTab('proyectos', 'Cargando visualizaciones de proyectos destacados...')" :class="tab === 'proyectos' ? 'tab-active' : ''" class="neo-button p-4 rounded-xl text-xs font-bold uppercase tracking-widest">Proyectos</button>
+                <button @click="setTab('info', 'Compilando base de conocimientos y habilidades...')" :class="tab === 'info' ? 'tab-active' : ''" class="neo-button p-4 rounded-xl text-xs font-bold uppercase tracking-widest">Skills</button>
+            </nav>
+
+            <div class="flex-1 p-8 md:p-12 overflow-y-auto relative">
+                
+                <section x-show="tab === 'perfil'" x-transition x-cloak class="space-y-6">
+                    <h2 class="text-4xl font-title text-pink-500 italic">HOLA!</h2>
+                    <p class="text-lg leading-relaxed text-slate-300">
+                        Soy estudiante de Diseño y Desarrollo de Software. Me especializo en crear puentes entre el diseño estético y el código robusto. Mi enfoque es la adaptabilidad y el liderazgo técnico.
+                    </p>
+                    <div class="grid grid-cols-2 gap-4 pt-6">
+                        <div class="bg-white/5 p-4 rounded-lg">
+                            <span class="text-blue-400 text-xs block mb-1 uppercase">Idiomas</span>
+                            <p class="text-sm">Español / Inglés (Avanzado) / Francés (Intermedio)</p>
+                        </div>
+                        <div class="bg-white/5 p-4 rounded-lg">
+                            <span class="text-blue-400 text-xs block mb-1 uppercase">Centro de Estudios</span>
+                            <p class="text-sm">TECSUP </p>
+                        </div>
+                    </div>
+                </section>
+
+                <section x-show="tab === 'exp'" x-transition x-cloak class="space-y-8">
+                    <h2 class="text-2xl font-bold text-blue-400 uppercase tracking-widest">Historial_Laboral</h2>
+                    <div class="relative border-l-2 border-pink-500 pl-6 space-y-8">
+                        <div>
+                            <span class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-pink-500 shadow-[0_0_10px_#ff00ff]"></span>
+                            <h3 class="text-xl font-bold">Trumontt Group</h3>
+                            <p class="text-pink-400 text-xs font-bold">PASANTE FRONT-END DEV | 2025 </p>
+                            <ul class="text-sm text-slate-400 mt-2 space-y-2">
+                                <li>• Desarrollo del e-commerce "Chiru".</li>
+                                <li>• Implementación de interfaces responsivas y modernas.</li>
+                                <li>• Colaboración directa con equipos de diseño y back-end.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section x-show="tab === 'proyectos'" x-transition x-cloak class="space-y-8">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="p-6 bg-gradient-to-br from-purple-900/40 to-black border border-purple-500/30 rounded-2xl">
+                            <h3 class="font-bold text-xl mb-2 text-pink-400">TecConnect</h3>
+                            <p class="text-[11px] text-slate-400 mb-4">Red social en Laravel/PHP con chat en tiempo real y foros.</p>
+                            <span class="text-[10px] bg-purple-500/20 p-1 px-2 rounded">PHP / Laravel / SQL</span>
+                        </div>
+                        <div class="p-6 bg-gradient-to-br from-blue-900/40 to-black border border-blue-500/30 rounded-2xl">
+                            <h3 class="font-bold text-xl mb-2 text-blue-400">KawsAi</h3>
+                            <p class="text-[11px] text-slate-400 mb-4">App de salud mental con AI Chatbot y gestión de citas.</p>
+                            <span class="text-[10px] bg-blue-500/20 p-1 px-2 rounded">Springboot / Kotlin / React</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section x-show="tab === 'info'" x-transition x-cloak>
+                    <h2 class="text-2xl font-bold text-blue-400 mb-6 uppercase tracking-widest">Technical_Skills</h2>
+                    <div class="space-y-6">
+                        <div>
+                            <p class="text-xs mb-2 text-slate-500">Dominio de Lenguajes</p>
+                            <div class="flex flex-wrap gap-2">
+                                <template x-for="skill in ['Java', 'Python', 'SQL', 'JavaScript', 'React', 'PHP', 'Kotlin', 'Django']">
+                                    <span class="border border-white/20 px-3 py-1 rounded text-xs hover:border-pink-500 transition cursor-default" x-text="skill"></span>
+                                </template>
+                            </div>
+                        </div>
+                        <div class="bg-pink-500/5 p-6 rounded-2xl border border-pink-500/20">
+                            <h4 class="text-sm font-bold text-pink-500 mb-2 uppercase">Fortalezas del Sistema</h4>
+                            <p class="text-xs text-slate-400 leading-relaxed italic">
+                                Capacidad de liderazgo en equipos de desarrollo, alta adaptabilidad a nuevos frameworks y resolución de problemas bajo metodologías ágiles.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <div id="bot-container" class="fixed bottom-[-20px] right-0 w-[150px] h-[150px] z-50 pointer-events-none"></div>
+    <div class="chat-bubble" :class="{ 'show': showBotMessage }" x-text="botMessage"></div>
+
+    <footer class="fixed bottom-8 w-full px-12 flex justify-between items-end z-50">
+        <div class="flex gap-6 pointer-auto">
+            <a href="https://github.com/Dan17003" target="_blank" class="text-[10px] font-bold tracking-[0.3em] hover:text-pink-500 transition uppercase">Github</a>
+            <a href="#" class="text-[10px] font-bold tracking-[0.3em] hover:text-blue-500 transition uppercase">LinkedIn</a>
+        </div>
+        <div class="text-[8px] text-white/20">© 2026 DANNA MENDOZA OS // ALL RIGHTS RESERVED</div>
+    </footer>
+
+    <script>
+        // BACKGROUND 3D - STARS EFFECT
+        let scene, camera, renderer, stars, bot, clock;
+
+        function init() {
+            // Fondo de Estrellas
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
+            camera.position.z = 1;
+            camera.rotation.x = Math.PI / 2;
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('bg-canvas').appendChild(renderer.domElement);
+
+            const starGeo = new THREE.BufferGeometry();
+            const starCount = 6000;
+            const posArray = new Float32Array(starCount * 3);
+
+            for(let i=0; i < starCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 600;
+            }
+
+            starGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.7 });
+            stars = new THREE.Points(starGeo, starMat);
+            scene.add(stars);
+
+            // Robot Asistente (Integrado con IA simulada)
+            initRobot();
+
+            animate();
+        }
+
+        function initRobot() {
+            const botContainer = document.getElementById('bot-container');
+            const botScene = new THREE.Scene();
+            const botCamera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+            botCamera.position.set(0, 0, 3);
+
+            const botRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            botRenderer.setSize(150, 150);
+            botContainer.appendChild(botRenderer.domElement);
+
+            // Geometría del robot (un "drone" geométrico)
+            const geometry = new THREE.IcosahedronGeometry(1, 0);
+            const material = new THREE.MeshPhongMaterial({
+                color: 0x9d00ff,
+                emissive: 0xff00ff,
+                wireframe: true,
+                shininess: 100
+            });
+            bot = new THREE.Mesh(geometry, material);
+            botScene.add(bot);
+
+            // Luces para el robot
+            const light = new THREE.PointLight(0x00d4ff, 2, 10);
+            light.position.set(2, 2, 2);
+            botScene.add(light);
+            botScene.add(new THREE.AmbientLight(0x404040));
+
+            clock = new THREE.Clock();
+
+            // Animación del robot
+            function animateBot() {
+                requestAnimationFrame(animateBot);
+                const elapsed = clock.getElapsedTime();
+                bot.rotation.y += 0.01;
+                bot.rotation.x = Math.sin(elapsed) * 0.2; // Movimiento de "respiración"
+                bot.position.y = Math.sin(elapsed * 2) * 0.1; // Flotación vertical
+                botRenderer.render(botScene, botCamera);
+            }
+            animateBot();
+        }
+
+        function animate() {
+            stars.rotation.y += 0.002;
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Interacción del Robot con el Mouse (analizando usuario)
+        document.addEventListener('mousemove', (e) => {
+            if (bot) {
+                const mouseX = (e.clientX - window.innerWidth / 2) / window.innerWidth;
+                const mouseY = (e.clientY - window.innerHeight / 2) / window.innerHeight;
+                bot.rotation.y = mouseX * 2;
+                bot.rotation.x = -mouseY * 2;
+            }
+        });
+
+        init();
+    </script>
+</body>
+</html>
